@@ -43,4 +43,4 @@ Fontes de dados
 
 Análise e modelagem completas.
 
-Gustavo Cruz | [LinkedIn](linkedin.com/in/gustavo-goncalves-cruz/) | [GitHub](https://github.com/Guszzs)
+Gustavo Cruz | [LinkedIn](https://linkedin.com/in/gustavo-goncalves-cruz)| [GitHub](https://github.com/Guszzs)
