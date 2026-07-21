@@ -41,6 +41,52 @@ Fontes de dados
 - Brasileirao_Dataset (adaoduque) - github.com/adaoduque/Brasileirao_Dataset
   Dataset público com todas as partidas do Brasileirão Série A desde 2003
 
+## Modelo de risco de rebaixamento na rodada 19
+
+O projeto também inclui um script para estimar quais clubes tinham maior risco de
+rebaixamento a partir da fotografia da tabela após 19 rodadas.
+
+Ele reconstrói as temporadas completas do dataset, monta atributos como pontos,
+saldo, aproveitamento, distância para o 16º colocado, desempenho recente e
+percentual de pontos em casa/fora, e treina uma regressão logística simples com
+validação por temporada.
+
+```bash
+python src/risco_rebaixamento.py --output-dir output
+```
+
+Por padrão, o script usa a última temporada com dados até a rodada 19 como alvo
+e as cinco temporadas completas anteriores como treino. No dataset público usado
+pelo projeto, a última temporada disponível no momento da implementação é 2024.
+Para simular 2026, use a tabela atual salva em
+`data/raw/brasileirao_2026_r19_snapshot.csv` como alvo. Essa tabela foi montada
+a partir da classificação publicada em 20/07/2026, com clubes ainda entre 18 e
+19 jogos disputados. Fonte consultada: TMC / Placar Futebol, tabela do
+Brasileirão Série A 2026.
+
+Para escolher outra temporada-alvo:
+
+```bash
+python src/risco_rebaixamento.py --target-season 2023 --output-dir output
+```
+
+Para projetar o risco de rebaixamento em 2026:
+
+```bash
+python src/risco_rebaixamento.py --target-season 2026 --target-table-csv data/raw/brasileirao_2026_r19_snapshot.csv --output-dir output_2026
+```
+
+Arquivos gerados:
+
+- `output/base_risco_rebaixamento.csv`: base modelada por clube/temporada;
+- `output/validacao_por_temporada.csv`: validação deixando uma temporada fora;
+- `output/probabilidades_rebaixamento_<temporada>.csv`: ranking de risco;
+- `output/graficos/ranking_risco_rebaixamento_<temporada>.png`;
+- `output/graficos/r19_vs_posicao_final_<temporada>.png`.
+
+O modelo não deve ser lido como "estes serão os rebaixados", e sim como uma
+estimativa de risco com base nos dados disponíveis até a rodada 19.
+
 Análise e modelagem completas.
 
 Gustavo Cruz | [LinkedIn](https://linkedin.com/in/gustavo-goncalves-cruz)| [GitHub](https://github.com/Guszzs)
