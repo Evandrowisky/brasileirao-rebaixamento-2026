@@ -1,0 +1,191 @@
+rodada,mandante,visitante
+20,Athletico-PR,Internacional
+20,Bahia,Corinthians
+20,Cruzeiro,Botafogo
+20,Flamengo,Sao Paulo
+20,Gremio,Fluminense
+20,Palmeiras,Atletico-MG
+20,Red Bull Bragantino,Coritiba
+20,Remo,Vitoria
+20,Santos,Chapecoense
+20,Vasco,Mirassol
+21,Corinthians,Athletico-PR
+21,Fluminense,Bahia
+21,Coritiba,Cruzeiro
+21,Internacional,Flamengo
+21,Botafogo,Gremio
+21,Vitoria,Palmeiras
+21,Atletico-MG,Red Bull Bragantino
+21,Mirassol,Remo
+21,Sao Paulo,Santos
+21,Chapecoense,Vasco
+22,Santos,Athletico-PR
+22,Remo,Atletico-MG
+22,Coritiba,Chapecoense
+22,Red Bull Bragantino,Corinthians
+22,Botafogo,Fluminense
+22,Palmeiras,Internacional
+22,Cruzeiro,Mirassol
+22,Gremio,Sao Paulo
+22,Bahia,Vasco
+22,Flamengo,Vitoria
+23,Chapecoense,Bahia
+23,Vitoria,Botafogo
+23,Sao Paulo,Coritiba
+23,Corinthians,Cruzeiro
+23,Mirassol,Flamengo
+23,Atletico-MG,Gremio
+23,Fluminense,Palmeiras
+23,Athletico-PR,Red Bull Bragantino
+23,Internacional,Remo
+23,Vasco,Santos
+24,Botafogo,Athletico-PR
+24,Internacional,Atletico-MG
+24,Vitoria,Bahia
+24,Coritiba,Corinthians
+24,Cruzeiro,Flamengo
+24,Red Bull Bragantino,Gremio
+24,Santos,Mirassol
+24,Fluminense,Remo
+24,Chapecoense,Sao Paulo
+24,Palmeiras,Vasco
+25,Flamengo,Botafogo
+25,Gremio,Chapecoense
+25,Remo,Coritiba
+25,Vasco,Cruzeiro
+25,Athletico-PR,Fluminense
+25,Bahia,Internacional
+25,Mirassol,Palmeiras
+25,Sao Paulo,Red Bull Bragantino
+25,Corinthians,Santos
+25,Atletico-MG,Vitoria
+26,Cruzeiro,Athletico-PR
+26,Sao Paulo,Atletico-MG
+26,Red Bull Bragantino,Bahia
+26,Corinthians,Chapecoense
+26,Remo,Flamengo
+26,Vitoria,Gremio
+26,Coritiba,Mirassol
+26,Botafogo,Palmeiras
+26,Internacional,Santos
+26,Fluminense,Vasco
+27,Coritiba,Athletico-PR
+27,Santos,Cruzeiro
+27,Atletico-MG,Fluminense
+27,Flamengo,Corinthians
+27,Chapecoense,Internacional
+27,Botafogo,Red Bull Bragantino
+27,Bahia,Remo
+27,Palmeiras,Sao Paulo
+27,Gremio,Vasco
+27,Mirassol,Vitoria
+28,Athletico-PR,Bahia
+28,Mirassol,Botafogo
+28,Atletico-MG,Chapecoense
+28,Vasco,Coritiba
+28,Vitoria,Cruzeiro
+28,Corinthians,Fluminense
+28,Sao Paulo,Internacional
+28,Gremio,Palmeiras
+28,Flamengo,Red Bull Bragantino
+28,Remo,Santos
+29,Athletico-PR,Atletico-MG
+29,Palmeiras,Bahia
+29,Vitoria,Chapecoense
+29,Internacional,Corinthians
+29,Fluminense,Coritiba
+29,Santos,Flamengo
+29,Remo,Gremio
+29,Red Bull Bragantino,Mirassol
+29,Cruzeiro,Sao Paulo
+29,Botafogo,Vasco
+30,Chapecoense,Athletico-PR
+30,Coritiba,Botafogo
+30,Palmeiras,Corinthians
+30,Red Bull Bragantino,Cruzeiro
+30,Flamengo,Fluminense
+30,Gremio,Internacional
+30,Bahia,Mirassol
+30,Vasco,Remo
+30,Atletico-MG,Santos
+30,Sao Paulo,Vitoria
+31,Botafogo,Chapecoense
+31,Atletico-MG,Coritiba
+31,Gremio,Cruzeiro
+31,Bahia,Flamengo
+31,Mirassol,Internacional
+31,Athletico-PR,Palmeiras
+31,Remo,Red Bull Bragantino
+31,Fluminense,Santos
+31,Sao Paulo,Vasco
+31,Corinthians,Vitoria
+32,Vitoria,Athletico-PR
+32,Flamengo,Atletico-MG
+32,Santos,Bahia
+32,Internacional,Botafogo
+32,Vasco,Corinthians
+32,Chapecoense,Fluminense
+32,Coritiba,Gremio
+32,Palmeiras,Red Bull Bragantino
+32,Cruzeiro,Remo
+32,Mirassol,Sao Paulo
+33,Gremio,Athletico-PR
+33,Remo,Botafogo
+33,Red Bull Bragantino,Chapecoense
+33,Atletico-MG,Cruzeiro
+33,Vasco,Flamengo
+33,Fluminense,Internacional
+33,Corinthians,Mirassol
+33,Santos,Palmeiras
+33,Bahia,Sao Paulo
+33,Coritiba,Vitoria
+34,Botafogo,Atletico-MG
+34,Cruzeiro,Bahia
+34,Sao Paulo,Corinthians
+34,Internacional,Coritiba
+34,Vitoria,Fluminense
+34,Flamengo,Gremio
+34,Chapecoense,Mirassol
+34,Palmeiras,Remo
+34,Red Bull Bragantino,Santos
+34,Athletico-PR,Vasco
+35,Flamengo,Athletico-PR
+35,Mirassol,Atletico-MG
+35,Gremio,Bahia
+35,Corinthians,Botafogo
+35,Remo,Chapecoense
+35,Sao Paulo,Fluminense
+35,Vasco,Internacional
+35,Cruzeiro,Palmeiras
+35,Vitoria,Red Bull Bragantino
+35,Coritiba,Santos
+36,Atletico-MG,Corinthians
+36,Bahia,Coritiba
+36,Chapecoense,Cruzeiro
+36,Palmeiras,Flamengo
+36,Santos,Gremio
+36,Fluminense,Mirassol
+36,Athletico-PR,Remo
+36,Botafogo,Sao Paulo
+36,Red Bull Bragantino,Vasco
+36,Internacional,Vitoria
+37,Mirassol,Athletico-PR
+37,Botafogo,Bahia
+37,Fluminense,Cruzeiro
+37,Coritiba,Flamengo
+37,Corinthians,Gremio
+37,Chapecoense,Palmeiras
+37,Internacional,Red Bull Bragantino
+37,Sao Paulo,Remo
+37,Vitoria,Santos
+37,Atletico-MG,Vasco
+38,Bahia,Atletico-MG
+38,Flamengo,Chapecoense
+38,Remo,Corinthians
+38,Palmeiras,Coritiba
+38,Red Bull Bragantino,Fluminense
+38,Cruzeiro,Internacional
+38,Gremio,Mirassol
+38,Athletico-PR,Sao Paulo
+38,Vasco,Vitoria
+38,Santos,Botafogo

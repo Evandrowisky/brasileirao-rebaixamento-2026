@@ -76,6 +76,28 @@ Para projetar o risco de rebaixamento em 2026:
 python src/risco_rebaixamento.py --target-season 2026 --target-table-csv data/raw/brasileirao_2026_r19_snapshot.csv --output-dir output_2026
 ```
 
+## Simulador Monte Carlo do Brasileirão 2026
+
+Além do risco histórico pela fotografia da rodada 19, o projeto agora tem uma
+segunda camada inspirada na arquitetura do
+[WorldCup-Predictor](https://github.com/silaskhalek/WorldCup-Predictor): rating
+Elo, probabilidades de vitória/empate/derrota e simulação Monte Carlo.
+
+O simulador calcula um Elo histórico com partidas reais do Brasileirão, ajusta a
+força dos clubes com a tabela atual de 2026, estima as probabilidades de cada
+jogo restante e simula o campeonato até a 38ª rodada.
+
+```bash
+python src/simulacao_monte_carlo.py --simulations 10000 --output-dir output_2026
+```
+
+Arquivos gerados:
+
+- `output_2026/monte_carlo_rebaixamento_2026.csv`: probabilidade de Z4, posição média e pontos médios;
+- `output_2026/distribuicao_posicoes_2026.csv`: distribuição completa de posições por clube;
+- `output_2026/graficos/monte_carlo_rebaixamento_2026.png`;
+- `output_2026/graficos/distribuicao_posicoes_2026.png`.
+
 Arquivos gerados:
 
 - `output/base_risco_rebaixamento.csv`: base modelada por clube/temporada;
