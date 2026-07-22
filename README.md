@@ -108,8 +108,10 @@ coleta automática de mercado, elenco, resultados recentes e ratings externos.
 Arquivos gerados:
 
 - `output_2026/monte_carlo_rebaixamento_2026.csv`: probabilidade de Z4, posição média e pontos médios;
+- `output_2026/tabela_final_media_2026.csv`: classificação final média projetada;
 - `output_2026/distribuicao_posicoes_2026.csv`: distribuição completa de posições por clube;
 - `output_2026/graficos/monte_carlo_rebaixamento_2026.png`;
+- `output_2026/graficos/tabela_final_media_2026.png`;
 - `output_2026/graficos/distribuicao_posicoes_2026.png`.
 
 Arquivos gerados:

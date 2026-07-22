@@ -224,13 +224,16 @@ def executar_simulacoes(
     ).sort_values("prob_rebaixamento", ascending=False)
     if contexto is not None:
         resultado = resultado.merge(contexto, on="time", how="left")
+    tabela_final_media = montar_tabela_final_media(resultado)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "graficos").mkdir(exist_ok=True)
     resultado.to_csv(output_dir / "monte_carlo_rebaixamento_2026.csv", index=False)
+    tabela_final_media.to_csv(output_dir / "tabela_final_media_2026.csv", index=False)
     distribuicao_df = pd.DataFrame(distribuicao, index=times, columns=range(1, 21)).div(n_simulations)
     distribuicao_df.to_csv(output_dir / "distribuicao_posicoes_2026.csv")
     salvar_grafico_rebaixamento(resultado, output_dir / "graficos" / "monte_carlo_rebaixamento_2026.png")
+    salvar_grafico_tabela_final(tabela_final_media, output_dir / "graficos" / "tabela_final_media_2026.png")
     salvar_grafico_posicoes(distribuicao_df, output_dir / "graficos" / "distribuicao_posicoes_2026.png")
 
     print(f"Simulacoes: {n_simulations}")
@@ -247,6 +250,48 @@ def executar_simulacoes(
         )
     )
     print(f"\nArquivos salvos em: {output_dir}")
+
+
+def montar_tabela_final_media(resultado: pd.DataFrame) -> pd.DataFrame:
+    tabela = resultado.sort_values(
+        ["pontos_medios", "posicao_media"],
+        ascending=[False, True],
+    ).reset_index(drop=True)
+    tabela["posicao_projetada"] = np.arange(1, len(tabela) + 1)
+    tabela["zona"] = np.where(tabela["posicao_projetada"] >= 17, "Z4", "")
+    colunas = [
+        "posicao_projetada",
+        "time",
+        "pontos_medios",
+        "posicao_media",
+        "prob_rebaixamento",
+        "elo_ajustado",
+        "zona",
+    ]
+    extras = [col for col in resultado.columns if col not in colunas]
+    return tabela[colunas + extras]
+
+
+def salvar_grafico_tabela_final(tabela: pd.DataFrame, path: Path) -> None:
+    plot = tabela.sort_values("pontos_medios", ascending=True)
+    cores = ["#B91C1C" if zona == "Z4" else "#2563EB" for zona in plot["zona"]]
+    fig, ax = plt.subplots(figsize=(10, 8))
+    ax.barh(plot["time"], plot["pontos_medios"], color=cores)
+    for i, row in enumerate(plot.itertuples()):
+        ax.text(
+            row.pontos_medios + 0.3,
+            i,
+            f"{row.posicao_projetada}o",
+            va="center",
+            fontsize=9,
+        )
+    ax.set_xlabel("Pontos medios apos 10.000 simulacoes")
+    ax.set_title("Tabela final media projetada - Brasileirao 2026")
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    fig.tight_layout()
+    fig.savefig(path, dpi=160)
+    plt.close(fig)
 
 
 def salvar_grafico_rebaixamento(resultado: pd.DataFrame, path: Path) -> None:
