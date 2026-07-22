@@ -82,14 +82,16 @@ def calcular_elo_historico(partidas: pd.DataFrame, ate_temporada: int = 2024) ->
 
 def ajustar_elo_com_snapshot(ratings: dict[str, float], tabela: pd.DataFrame) -> dict[str, float]:
     ajustados = ratings.copy()
-    media_ppj = tabela["pontos_por_jogo"].mean()
     media_saldo = tabela["saldo_por_jogo"].mean()
+    media_gols_pro = tabela["gols_pro_por_jogo"].mean()
+    media_gols_contra = tabela["gols_contra_por_jogo"].mean()
     for _, row in tabela.iterrows():
         time = normalizar_time(row["time"])
         base = ajustados.get(time, INITIAL_ELO)
-        ajuste_ppj = (row["pontos_por_jogo"] - media_ppj) * 120
-        ajuste_saldo = (row["saldo_por_jogo"] - media_saldo) * 65
-        ajustados[time] = base + ajuste_ppj + ajuste_saldo
+        ajuste_ataque = (row["gols_pro_por_jogo"] - media_gols_pro) * 85
+        ajuste_defesa = (media_gols_contra - row["gols_contra_por_jogo"]) * 95
+        ajuste_saldo = (row["saldo_por_jogo"] - media_saldo) * 45
+        ajustados[time] = base + ajuste_ataque + ajuste_defesa + ajuste_saldo
     return ajustados
 
 
@@ -133,6 +135,8 @@ def carregar_tabela_atual(path: Path) -> pd.DataFrame:
     tabela["time"] = tabela["time"].map(normalizar_time)
     tabela["pontos_por_jogo"] = tabela["pontos"] / tabela["jogos"]
     tabela["saldo_por_jogo"] = tabela["saldo_gols"] / tabela["jogos"]
+    tabela["gols_pro_por_jogo"] = tabela["gols_pro"] / tabela["jogos"]
+    tabela["gols_contra_por_jogo"] = tabela["gols_contra"] / tabela["jogos"]
     return tabela
 
 
@@ -307,7 +311,7 @@ def salvar_grafico_tabela_final(tabela: pd.DataFrame, path: Path) -> None:
 
 
 def salvar_card_tabela_final(tabela: pd.DataFrame, path: Path) -> None:
-    plot = tabela.sort_values("posicao_projetada").copy()
+    plot = tabela.sort_values("prob_rebaixamento", ascending=False).copy()
     fig = plt.figure(figsize=(12, 16), facecolor="#F8FAFC")
     ax = fig.add_axes([0.07, 0.08, 0.86, 0.78])
     ax.set_facecolor("#F8FAFC")
@@ -315,41 +319,54 @@ def salvar_card_tabela_final(tabela: pd.DataFrame, path: Path) -> None:
     y = np.arange(len(plot))
     cores = []
     for row in plot.itertuples():
-        if row.zona == "Z4":
+        if row.prob_rebaixamento >= 0.50:
             cores.append("#DC2626")
-        elif row.posicao_projetada <= 6:
-            cores.append("#2563EB")
         elif row.prob_rebaixamento >= 0.20:
             cores.append("#F97316")
+        elif row.prob_rebaixamento >= 0.05:
+            cores.append("#FACC15")
         else:
             cores.append("#16A34A")
 
-    ax.barh(y, plot["pontos_medios"], color=cores, height=0.72)
+    risco_pct = plot["prob_rebaixamento"] * 100
+    ax.barh(y, risco_pct, color=cores, height=0.72)
     ax.invert_yaxis()
     ax.set_yticks(y)
     ax.set_yticklabels([])
-    ax.set_xlim(-22, max(plot["pontos_medios"]) + 15)
-    ax.set_xticks([0, 20, 40, 60, 80])
+    ax.set_xlim(-24, 108)
+    ax.set_xticks([0, 20, 40, 60, 80, 100])
     ax.tick_params(axis="y", length=0)
-    ax.set_xlabel("Pontos médios projetados", fontsize=11, color="#334155")
+    ax.set_xlabel("Probabilidade de terminar no Z4 (%)", fontsize=11, color="#334155")
     ax.grid(axis="x", color="#CBD5E1", alpha=0.6, linewidth=0.8)
     ax.set_axisbelow(True)
 
     for i, row in enumerate(plot.itertuples()):
-        pos = f"{int(row.posicao_projetada):02d}"
+        pos = f"{i + 1:02d}"
         risco = f"{row.prob_rebaixamento * 100:4.1f}%"
-        pontos = f"{row.pontos_medios:4.1f} pts"
         ax.text(-21.5, i, pos, va="center", ha="left", fontsize=10, color="#475569", weight="bold")
         ax.text(-17.0, i, nome_exibicao(row.time), va="center", ha="left", fontsize=12, color="#0F172A", weight="bold")
-        ax.text(
-            row.pontos_medios + 0.7,
-            i,
-            f"{pontos} | Z4: {risco}",
-            va="center",
-            ha="left",
-            fontsize=10,
-            color="#0F172A",
-        )
+        label = f"Z4: {risco} | pos. media: {row.posicao_media:4.1f} | forca: {row.elo_ajustado:4.0f}"
+        if row.prob_rebaixamento >= 0.72:
+            ax.text(
+                row.prob_rebaixamento * 100 - 1.0,
+                i,
+                label,
+                va="center",
+                ha="right",
+                fontsize=10,
+                color="white",
+                weight="bold",
+            )
+        else:
+            ax.text(
+                row.prob_rebaixamento * 100 + 1.0,
+                i,
+                label,
+                va="center",
+                ha="left",
+                fontsize=10,
+                color="#0F172A",
+            )
 
     for spine in ["top", "right", "left"]:
         ax.spines[spine].set_visible(False)
@@ -358,7 +375,7 @@ def salvar_card_tabela_final(tabela: pd.DataFrame, path: Path) -> None:
     fig.text(
         0.07,
         0.955,
-        "Tabela final média projetada",
+        "Ranking analitico de risco de rebaixamento",
         fontsize=25,
         weight="bold",
         color="#0F172A",
@@ -366,23 +383,23 @@ def salvar_card_tabela_final(tabela: pd.DataFrame, path: Path) -> None:
     fig.text(
         0.07,
         0.928,
-        "Brasileirão 2026 | 10.000 simulações Monte Carlo com Elo, gols, forma recente e contexto dos clubes",
+        "Brasileirao 2026 | 10.000 simulacoes Monte Carlo sem pontos atuais como parametro de forca",
         fontsize=11.5,
         color="#475569",
     )
     fig.text(
         0.07,
         0.895,
-        "Leitura: a posição vem da média de pontos simulados. A coluna Z4 mostra a chance de terminar entre os quatro últimos.",
+        "Leitura: o modelo usa Elo historico, gols, defesa, forma recente, elenco e historico de Serie A. Pontos atuais entram apenas como estado da tabela.",
         fontsize=10.5,
         color="#64748B",
     )
 
     legendas = [
-        ("G6 projetado", "#2563EB"),
-        ("Zona intermediaria", "#16A34A"),
-        ("Alerta de risco", "#F97316"),
-        ("Z4 projetado", "#DC2626"),
+        ("Risco muito alto", "#DC2626"),
+        ("Risco alto", "#F97316"),
+        ("Risco medio", "#FACC15"),
+        ("Risco baixo", "#16A34A"),
     ]
     x0 = 0.07
     for label, color in legendas:
@@ -392,11 +409,11 @@ def salvar_card_tabela_final(tabela: pd.DataFrame, path: Path) -> None:
         fig.text(x0 + 0.023, 0.872, label, fontsize=10, color="#334155")
         x0 += 0.18
 
-    z4 = plot[plot["zona"] == "Z4"]["time"].tolist()
+    maiores_riscos = [nome_exibicao(time) for time in plot.head(4)["time"].tolist()]
     fig.text(
         0.07,
         0.035,
-        "Z4 médio projetado: " + ", ".join(z4),
+        "Maiores riscos pelo modelo: " + ", ".join(maiores_riscos),
         fontsize=12,
         weight="bold",
         color="#991B1B",
@@ -404,7 +421,7 @@ def salvar_card_tabela_final(tabela: pd.DataFrame, path: Path) -> None:
     fig.text(
         0.07,
         0.018,
-        "Fonte: dataset histórico do Brasileirão + snapshot 2026 + calendário restante. Modelo experimental para análise exploratória.",
+        "Fonte: dataset historico do Brasileirao + gols/status 2026 + calendario restante + contexto dos clubes. Modelo exploratorio.",
         fontsize=9,
         color="#64748B",
     )

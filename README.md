@@ -83,11 +83,12 @@ segunda camada inspirada na arquitetura do
 [WorldCup-Predictor](https://github.com/silaskhalek/WorldCup-Predictor): rating
 Elo, probabilidades de vitória/empate/derrota e simulação Monte Carlo.
 
-O simulador calcula um Elo histórico com partidas reais do Brasileirão, ajusta a
-força dos clubes com contexto de elenco, histórico recente de Série A,
-classificação da temporada anterior, forma dos últimos cinco jogos e desempenho
-atual de 2026. Depois estima as probabilidades de cada jogo restante e simula o
-campeonato até a 38ª rodada.
+O simulador calcula um Elo histórico com partidas reais do Brasileirão e ajusta
+a força dos clubes com contexto de elenco, histórico recente de Série A,
+classificação da temporada anterior, forma dos últimos cinco jogos, gols marcados
+e gols sofridos em 2026. Os pontos atuais não entram como parâmetro de força do
+modelo; eles são usados apenas como estado inicial da tabela oficial antes de
+simular os jogos restantes.
 
 ```bash
 python src/simulacao_monte_carlo.py --simulations 10000 --output-dir output_2026
@@ -112,7 +113,7 @@ Arquivos gerados:
 - `output_2026/distribuicao_posicoes_2026.csv`: distribuição completa de posições por clube;
 - `output_2026/graficos/monte_carlo_rebaixamento_2026.png`;
 - `output_2026/graficos/tabela_final_media_2026.png`;
-- `output_2026/graficos/tabela_final_media_2026.jpg`: card formatado para post;
+- `output_2026/graficos/tabela_final_media_2026.jpg`: card formatado para post, ordenado por risco e não por pontos;
 - `output_2026/graficos/distribuicao_posicoes_2026.png`.
 
 Arquivos gerados:
