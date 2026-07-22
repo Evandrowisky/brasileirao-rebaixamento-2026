@@ -84,12 +84,26 @@ segunda camada inspirada na arquitetura do
 Elo, probabilidades de vitória/empate/derrota e simulação Monte Carlo.
 
 O simulador calcula um Elo histórico com partidas reais do Brasileirão, ajusta a
-força dos clubes com a tabela atual de 2026, estima as probabilidades de cada
-jogo restante e simula o campeonato até a 38ª rodada.
+força dos clubes com contexto de elenco, histórico recente de Série A,
+classificação da temporada anterior, forma dos últimos cinco jogos e desempenho
+atual de 2026. Depois estima as probabilidades de cada jogo restante e simula o
+campeonato até a 38ª rodada.
 
 ```bash
 python src/simulacao_monte_carlo.py --simulations 10000 --output-dir output_2026
 ```
+
+O arquivo `data/raw/brasileirao_2026_team_context.csv` concentra as variáveis
+que não vêm apenas da tabela atual:
+
+- `serie_a_last_5`: presença recente na Série A;
+- `previous_season_tier` e `previous_season_position`: nível e posição em 2025;
+- `squad_strength_0_100`: proxy editável de força do elenco;
+- `recent_points_last5` e `recent_goal_diff_last5`: forma recente.
+
+Esse arquivo existe justamente para evitar que a simulação seja só uma cópia da
+classificação atual. Em uma versão de produção, ele pode ser substituído por uma
+coleta automática de mercado, elenco, resultados recentes e ratings externos.
 
 Arquivos gerados:
 

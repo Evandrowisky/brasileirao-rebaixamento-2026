@@ -13,6 +13,13 @@ from risco_rebaixamento import carregar_partidas
 HOME_ADVANTAGE = 60
 INITIAL_ELO = 1500
 K_FACTOR = 28
+CONTEXT_WEIGHTS = {
+    "squad_strength_0_100": 2.2,
+    "serie_a_last_5": 18.0,
+    "previous_season_score": 0.9,
+    "recent_points_last5": 8.0,
+    "recent_goal_diff_last5": 8.0,
+}
 
 
 def normalizar_time(nome: str) -> str:
@@ -75,6 +82,41 @@ def ajustar_elo_com_snapshot(ratings: dict[str, float], tabela: pd.DataFrame) ->
     return ajustados
 
 
+def carregar_contexto(path: Path | None) -> pd.DataFrame | None:
+    if path is None or not path.exists():
+        return None
+    contexto = pd.read_csv(path)
+    contexto["time"] = contexto["time"].map(normalizar_time)
+    tier_bonus = contexto["previous_season_tier"].map({"A": 0, "B": -12}).fillna(-20)
+    contexto["previous_season_score"] = 21 - contexto["previous_season_position"] + tier_bonus
+    return contexto
+
+
+def ajustar_elo_com_contexto(
+    ratings: dict[str, float],
+    contexto: pd.DataFrame | None,
+) -> dict[str, float]:
+    if contexto is None:
+        return ratings
+    ajustados = ratings.copy()
+    medias = contexto[
+        [
+            "squad_strength_0_100",
+            "serie_a_last_5",
+            "previous_season_score",
+            "recent_points_last5",
+            "recent_goal_diff_last5",
+        ]
+    ].mean()
+    for _, row in contexto.iterrows():
+        time = normalizar_time(row["time"])
+        ajuste = 0.0
+        for col, peso in CONTEXT_WEIGHTS.items():
+            ajuste += (row[col] - medias[col]) * peso
+        ajustados[time] = ajustados.get(time, INITIAL_ELO) + ajuste
+    return ajustados
+
+
 def carregar_tabela_atual(path: Path) -> pd.DataFrame:
     tabela = pd.read_csv(path)
     tabela["time"] = tabela["time"].map(normalizar_time)
@@ -104,6 +146,7 @@ def ordenar_tabela(tabela: pd.DataFrame) -> pd.DataFrame:
 def executar_simulacoes(
     tabela_path: Path,
     fixtures_path: Path,
+    context_path: Path | None,
     output_dir: Path,
     n_simulations: int,
     seed: int,
@@ -111,7 +154,10 @@ def executar_simulacoes(
     partidas = carregar_partidas()
     tabela = carregar_tabela_atual(tabela_path)
     fixtures = pd.read_csv(fixtures_path)
-    ratings = ajustar_elo_com_snapshot(calcular_elo_historico(partidas), tabela)
+    contexto = carregar_contexto(context_path)
+    ratings = calcular_elo_historico(partidas)
+    ratings = ajustar_elo_com_contexto(ratings, contexto)
+    ratings = ajustar_elo_com_snapshot(ratings, tabela)
     rng = np.random.default_rng(seed)
 
     times = tabela["time"].tolist()
@@ -176,6 +222,8 @@ def executar_simulacoes(
             "elo_ajustado": [ratings.get(t, INITIAL_ELO) for t in times],
         }
     ).sort_values("prob_rebaixamento", ascending=False)
+    if contexto is not None:
+        resultado = resultado.merge(contexto, on="time", how="left")
 
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "graficos").mkdir(exist_ok=True)
@@ -236,6 +284,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--table-csv", type=Path, default=Path("data/raw/brasileirao_2026_r19_snapshot.csv"))
     parser.add_argument("--fixtures-csv", type=Path, default=Path("data/raw/brasileirao_2026_remaining_fixtures.csv"))
+    parser.add_argument("--context-csv", type=Path, default=Path("data/raw/brasileirao_2026_team_context.csv"))
     parser.add_argument("--output-dir", type=Path, default=Path("output_2026"))
     parser.add_argument("--simulations", type=int, default=10000)
     parser.add_argument("--seed", type=int, default=42)
@@ -247,6 +296,7 @@ if __name__ == "__main__":
     executar_simulacoes(
         tabela_path=args.table_csv,
         fixtures_path=args.fixtures_csv,
+        context_path=args.context_csv,
         output_dir=args.output_dir,
         n_simulations=args.simulations,
         seed=args.seed,
