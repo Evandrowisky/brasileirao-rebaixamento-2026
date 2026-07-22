@@ -106,6 +106,31 @@ Esse arquivo existe justamente para evitar que a simulação seja só uma cópia
 classificação atual. Em uma versão de produção, ele pode ser substituído por uma
 coleta automática de mercado, elenco, resultados recentes e ratings externos.
 
+## Modelo sem pontos e sem posição na tabela
+
+Para evitar que o modelo apenas copie a classificação atual, o projeto inclui um
+classificador separado que remove completamente pontos, posição, vitórias e
+distância para o Z4 das variáveis explicativas.
+
+```bash
+python src/modelo_qualidade_rebaixamento.py --output-dir output_2026
+```
+
+Esse modelo usa apenas atributos de qualidade do time:
+
+- ataque, defesa e saldo por jogo;
+- forma recente;
+- Elo histórico;
+- histórico recente na Série A;
+- força de elenco;
+- temporada anterior.
+
+Arquivos gerados:
+
+- `output_2026/base_ml_sem_tabela.csv`;
+- `output_2026/risco_ml_sem_tabela_2026.csv`;
+- `output_2026/graficos/risco_ml_sem_tabela_2026.jpg`.
+
 Arquivos gerados:
 
 - `output_2026/monte_carlo_rebaixamento_2026.csv`: probabilidade de Z4, posição média e pontos médios;
