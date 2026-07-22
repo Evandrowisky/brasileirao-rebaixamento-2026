@@ -34,6 +34,17 @@ def normalizar_time(nome: str) -> str:
     return mapa.get(nome, nome)
 
 
+def nome_exibicao(nome: str) -> str:
+    mapa = {
+        "Atletico-MG": "Atlético-MG",
+        "Athletico-PR": "Athletico-PR",
+        "Gremio": "Grêmio",
+        "Sao Paulo": "São Paulo",
+        "Vitoria": "Vitória",
+    }
+    return mapa.get(nome, nome)
+
+
 def resultado_real(gols_mandante: int, gols_visitante: int) -> float:
     if gols_mandante > gols_visitante:
         return 1.0
@@ -234,6 +245,7 @@ def executar_simulacoes(
     distribuicao_df.to_csv(output_dir / "distribuicao_posicoes_2026.csv")
     salvar_grafico_rebaixamento(resultado, output_dir / "graficos" / "monte_carlo_rebaixamento_2026.png")
     salvar_grafico_tabela_final(tabela_final_media, output_dir / "graficos" / "tabela_final_media_2026.png")
+    salvar_card_tabela_final(tabela_final_media, output_dir / "graficos" / "tabela_final_media_2026.jpg")
     salvar_grafico_posicoes(distribuicao_df, output_dir / "graficos" / "distribuicao_posicoes_2026.png")
 
     print(f"Simulacoes: {n_simulations}")
@@ -291,6 +303,112 @@ def salvar_grafico_tabela_final(tabela: pd.DataFrame, path: Path) -> None:
     ax.spines["right"].set_visible(False)
     fig.tight_layout()
     fig.savefig(path, dpi=160)
+    plt.close(fig)
+
+
+def salvar_card_tabela_final(tabela: pd.DataFrame, path: Path) -> None:
+    plot = tabela.sort_values("posicao_projetada").copy()
+    fig = plt.figure(figsize=(12, 16), facecolor="#F8FAFC")
+    ax = fig.add_axes([0.07, 0.08, 0.86, 0.78])
+    ax.set_facecolor("#F8FAFC")
+
+    y = np.arange(len(plot))
+    cores = []
+    for row in plot.itertuples():
+        if row.zona == "Z4":
+            cores.append("#DC2626")
+        elif row.posicao_projetada <= 6:
+            cores.append("#2563EB")
+        elif row.prob_rebaixamento >= 0.20:
+            cores.append("#F97316")
+        else:
+            cores.append("#16A34A")
+
+    ax.barh(y, plot["pontos_medios"], color=cores, height=0.72)
+    ax.invert_yaxis()
+    ax.set_yticks(y)
+    ax.set_yticklabels([])
+    ax.set_xlim(-22, max(plot["pontos_medios"]) + 15)
+    ax.set_xticks([0, 20, 40, 60, 80])
+    ax.tick_params(axis="y", length=0)
+    ax.set_xlabel("Pontos médios projetados", fontsize=11, color="#334155")
+    ax.grid(axis="x", color="#CBD5E1", alpha=0.6, linewidth=0.8)
+    ax.set_axisbelow(True)
+
+    for i, row in enumerate(plot.itertuples()):
+        pos = f"{int(row.posicao_projetada):02d}"
+        risco = f"{row.prob_rebaixamento * 100:4.1f}%"
+        pontos = f"{row.pontos_medios:4.1f} pts"
+        ax.text(-21.5, i, pos, va="center", ha="left", fontsize=10, color="#475569", weight="bold")
+        ax.text(-17.0, i, nome_exibicao(row.time), va="center", ha="left", fontsize=12, color="#0F172A", weight="bold")
+        ax.text(
+            row.pontos_medios + 0.7,
+            i,
+            f"{pontos} | Z4: {risco}",
+            va="center",
+            ha="left",
+            fontsize=10,
+            color="#0F172A",
+        )
+
+    for spine in ["top", "right", "left"]:
+        ax.spines[spine].set_visible(False)
+    ax.spines["bottom"].set_color("#94A3B8")
+
+    fig.text(
+        0.07,
+        0.955,
+        "Tabela final média projetada",
+        fontsize=25,
+        weight="bold",
+        color="#0F172A",
+    )
+    fig.text(
+        0.07,
+        0.928,
+        "Brasileirão 2026 | 10.000 simulações Monte Carlo com Elo, gols, forma recente e contexto dos clubes",
+        fontsize=11.5,
+        color="#475569",
+    )
+    fig.text(
+        0.07,
+        0.895,
+        "Leitura: a posição vem da média de pontos simulados. A coluna Z4 mostra a chance de terminar entre os quatro últimos.",
+        fontsize=10.5,
+        color="#64748B",
+    )
+
+    legendas = [
+        ("G6 projetado", "#2563EB"),
+        ("Zona intermediaria", "#16A34A"),
+        ("Alerta de risco", "#F97316"),
+        ("Z4 projetado", "#DC2626"),
+    ]
+    x0 = 0.07
+    for label, color in legendas:
+        fig.patches.append(
+            plt.Rectangle((x0, 0.875), 0.018, 0.012, transform=fig.transFigure, color=color, clip_on=False)
+        )
+        fig.text(x0 + 0.023, 0.872, label, fontsize=10, color="#334155")
+        x0 += 0.18
+
+    z4 = plot[plot["zona"] == "Z4"]["time"].tolist()
+    fig.text(
+        0.07,
+        0.035,
+        "Z4 médio projetado: " + ", ".join(z4),
+        fontsize=12,
+        weight="bold",
+        color="#991B1B",
+    )
+    fig.text(
+        0.07,
+        0.018,
+        "Fonte: dataset histórico do Brasileirão + snapshot 2026 + calendário restante. Modelo experimental para análise exploratória.",
+        fontsize=9,
+        color="#64748B",
+    )
+    fig.savefig(path, dpi=180, format="jpg", pil_kwargs={"quality": 94})
     plt.close(fig)
 
 

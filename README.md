@@ -112,6 +112,7 @@ Arquivos gerados:
 - `output_2026/distribuicao_posicoes_2026.csv`: distribuição completa de posições por clube;
 - `output_2026/graficos/monte_carlo_rebaixamento_2026.png`;
 - `output_2026/graficos/tabela_final_media_2026.png`;
+- `output_2026/graficos/tabela_final_media_2026.jpg`: card formatado para post;
 - `output_2026/graficos/distribuicao_posicoes_2026.png`.
 
 Arquivos gerados:
